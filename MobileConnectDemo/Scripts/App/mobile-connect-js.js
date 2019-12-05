@@ -10,6 +10,11 @@
         if (!redirectUrl)
             return;
 
+        var discoveryUrl = $("#mobileConnectAuthSetup #discoveryUrl").val();
+
+        if (!discoveryUrl)
+            return;
+
         var discoveryClientId = $("#mobileConnectAuthSetup #discoveryClientId").val();
 
         if (!discoveryClientId)
@@ -23,11 +28,12 @@
         var requestData = {
             phoneNumber: phoneNumber,
             redirectUrl: redirectUrl,
+            discoveryUrl: discoveryUrl,
             discoveryClientId: discoveryClientId,
             discoveryPassword: discoveryPassword
         };
 
-        $.post("/Home/MobileConnectAuthorize", requestData)
+        $.post("/MobileConnect/Authorize", requestData)
             .done(function(responseConetnt) {
                 if (responseConetnt) {
                     $("#mobileConnectAuthResult").html(responseConetnt);

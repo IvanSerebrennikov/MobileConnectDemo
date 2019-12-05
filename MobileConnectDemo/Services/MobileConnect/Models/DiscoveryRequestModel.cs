@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace MobileConnectDemo.Models
+namespace MobileConnectDemo.Services.MobileConnect.Models
 {
-    public class MobileConnectAuthorizeModel
+    public class DiscoveryRequestModel
     {
         public string PhoneNumber { get; set; }
 
@@ -16,5 +16,7 @@ namespace MobileConnectDemo.Models
         public string DiscoveryClientId { get; set; }
 
         public string DiscoveryPassword { get; set; }
+
+        public string CorrelationId { get; set; }
     }
 }
