@@ -130,6 +130,8 @@
     <Compile Include="Services\MobileConnect\IMobileConnectService.cs" />
     <Compile Include="Services\MobileConnect\Models\DiscoveryRequestModel.cs" />
     <Compile Include="Services\MobileConnect\MobileConnectService.cs" />
+    <Compile Include="Services\MobileConnect\Models\DiscoveryResponse.cs" />
+    <Compile Include="Services\MobileConnect\Models\DiscoveryResponseModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />

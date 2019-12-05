@@ -40,12 +40,9 @@ namespace MobileConnectDemo.Controllers
             };
 
             var discoveryResponse = await _mobileConnectService.SendDiscoveryRequest(discoveryRequestModel);
-
+            
             return Content(
-                JsonConvert.SerializeObject(new
-                {
-                    discoveryResponse = discoveryResponse
-                }));
+                JsonConvert.SerializeObject(discoveryResponse));
         }
     }
 }

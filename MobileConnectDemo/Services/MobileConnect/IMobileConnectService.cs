@@ -9,6 +9,6 @@ namespace MobileConnectDemo.Services.MobileConnect
 {
     public interface IMobileConnectService
     {
-        Task<string> SendDiscoveryRequest(DiscoveryRequestModel requestModel);
+        Task<DiscoveryResponse> SendDiscoveryRequest(DiscoveryRequestModel requestModel);
     }
 }

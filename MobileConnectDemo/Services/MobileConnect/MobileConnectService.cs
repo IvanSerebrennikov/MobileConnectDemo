@@ -5,12 +5,13 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using MobileConnectDemo.Services.MobileConnect.Models;
+using Newtonsoft.Json;
 
 namespace MobileConnectDemo.Services.MobileConnect
 {
     public class MobileConnectService : IMobileConnectService
     {
-        public async Task<string> SendDiscoveryRequest(DiscoveryRequestModel requestModel)
+        public async Task<DiscoveryResponse> SendDiscoveryRequest(DiscoveryRequestModel requestModel)
         {
             using (var httpClient = new HttpClient())
             {
@@ -32,7 +33,15 @@ namespace MobileConnectDemo.Services.MobileConnect
 
                 var response = await httpClient.PostAsync(requestModel.DiscoveryUrl, content);
 
-                return await response.Content.ReadAsStringAsync();
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var responseModel = JsonConvert.DeserializeObject<DiscoveryResponseModel>(responseString);
+
+                return new DiscoveryResponse
+                {
+                    Model = responseModel,
+                    JsonString = responseString
+                };
             }
         }
     }
