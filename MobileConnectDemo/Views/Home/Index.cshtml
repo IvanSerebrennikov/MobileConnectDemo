@@ -2,21 +2,36 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-
-<div class="row">
+<div class="row" id="mobileConnect" style="padding: 50px;">
     <div class="col-md-6">
-        <div id="mobile-connect-auth-setup">
+        <div id="mobileConnectAuthSetup">
+            <div class="form-group">
+                <label for="phoneNumber">Phone number</label>
+                <input type="text" class="form-control" name="phoneNumber" id="phoneNumber">
+            </div>
+            <div class="form-group">
+                <label for="redirectUrl">Redirect URL</label>
+                <input type="text" class="form-control" name="redirectUrl" id="redirectUrl">
+            </div>
+            <div class="form-group">
+                <label for="discoveryClientId">Discovery ClientId</label>
+                <input type="text" class="form-control" name="discoveryClientId" id="discoveryClientId">
+            </div>
+            <div class="form-group">
+                <label for="discoveryPassword">Discovery Password</label>
+                <input type="text" class="form-control" name="discoveryPassword" id="discoveryPassword">
+            </div>
 
+            <button class="btn btn-default" id="mobileConnectAuthSubmit">Submit</button>
         </div>
     </div>
     <div class="col-md-6">
-        <div id="mobile-connect-auth-result">
+        <div id="mobileConnectAuthResult">
 
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script src="/Scripts/App/mobile-connect-js.js"></script>
+}
