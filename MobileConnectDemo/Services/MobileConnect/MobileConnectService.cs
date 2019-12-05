@@ -44,5 +44,15 @@ namespace MobileConnectDemo.Services.MobileConnect
                 };
             }
         }
+
+        public async Task<string> SendOpenIdConfigurationRequest(string openIdConfigurationUrl)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var responseString = await httpClient.GetStringAsync(openIdConfigurationUrl);
+
+                return responseString;
+            }
+        }
     }
 }

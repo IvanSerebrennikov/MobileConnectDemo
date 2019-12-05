@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using MobileConnectDemo.Models;
@@ -40,9 +41,26 @@ namespace MobileConnectDemo.Controllers
             };
 
             var discoveryResponse = await _mobileConnectService.SendDiscoveryRequest(discoveryRequestModel);
-            
+
+            if (discoveryResponse == null)
+                return Content("Discovery Response is null");
+
+            var openIdConfigurationRel = "openid-configuration";
+            var openIdConfigurationUrl =
+                discoveryResponse.Model?.Response?.Apis?.OperatorId?.Links.FirstOrDefault(x =>
+                    x.Rel == openIdConfigurationRel)?.Href;
+
+            if (string.IsNullOrEmpty(openIdConfigurationUrl))
+                return Content("OpenId Configuration Url is null or empty");
+
+            var openIdConfigurationResponse = await _mobileConnectService.SendOpenIdConfigurationRequest(openIdConfigurationUrl);
+
             return Content(
-                JsonConvert.SerializeObject(discoveryResponse));
+                JsonConvert.SerializeObject(new
+                {
+                    discoveryResponse = discoveryResponse,
+                    openIdConfigurationResponse = openIdConfigurationResponse
+                }));
         }
     }
 }

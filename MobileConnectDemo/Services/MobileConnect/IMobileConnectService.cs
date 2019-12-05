@@ -10,5 +10,7 @@ namespace MobileConnectDemo.Services.MobileConnect
     public interface IMobileConnectService
     {
         Task<DiscoveryResponse> SendDiscoveryRequest(DiscoveryRequestModel requestModel);
+
+        Task<string> SendOpenIdConfigurationRequest(string openIdConfigurationUrl);
     }
 }
