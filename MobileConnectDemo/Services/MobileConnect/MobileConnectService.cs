@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,7 +12,73 @@ namespace MobileConnectDemo.Services.MobileConnect
 {
     public class MobileConnectService : IMobileConnectService
     {
-        public async Task<DiscoveryResponse> SendDiscoveryRequest(DiscoveryRequestModel requestModel)
+        public async Task<MobileConnectAuthorizeResult> SiAuthorize(MobileConnectAuthorizeSettings settings)
+        {
+            var result = new MobileConnectAuthorizeResult();
+
+            try
+            {
+                var correlationId = Guid.NewGuid().ToString();
+
+                var discoveryRequest = new DiscoveryRequestModel
+                {
+                    PhoneNumber = settings.PhoneNumber,
+                    RedirectUrl = settings.RedirectUrl,
+                    DiscoveryUrl = settings.DiscoveryUrl,
+                    DiscoveryClientId = settings.DiscoveryClientId,
+                    DiscoveryPassword = settings.DiscoveryPassword,
+                    CorrelationId = correlationId
+                };
+
+                var discoveryResponse = await SendDiscoveryRequest(discoveryRequest);
+
+                if (discoveryResponse == null)
+                {
+                    result.ErrorMessage = "Discovery Response is null";
+
+                    return result;
+                }
+
+                result.DiscoveryResponse = discoveryResponse;
+
+                var openIdConfigurationRel = "openid-configuration";
+                var openIdConfigurationUrl =
+                    discoveryResponse.Model?.Response?.Apis?.OperatorId?.Links.FirstOrDefault(x =>
+                        x.Rel == openIdConfigurationRel)?.Href;
+
+                if (string.IsNullOrEmpty(openIdConfigurationUrl))
+                {
+                    result.ErrorMessage = "OpenId Configuration Url is null or empty";
+
+                    return result;
+                }
+
+                var openIdConfigurationRequestModel = new OpenIdConfigurationRequestModel
+                {
+                    OpenIdConfigurationUrl = openIdConfigurationUrl
+                };
+
+                var openIdConfigurationResponse =
+                    await SendOpenIdConfigurationRequest(openIdConfigurationRequestModel);
+
+                if (openIdConfigurationResponse == null)
+                {
+                    result.ErrorMessage = "OpenId Configuration Response is null";
+
+                    return result;
+                }
+
+                result.OpenIdConfigurationResponse = openIdConfigurationResponse;
+            }
+            catch (Exception e)
+            {
+                result.ErrorMessage = e.Message;
+            }
+
+            return result;
+        }
+
+        private async Task<DiscoveryResponse> SendDiscoveryRequest(DiscoveryRequestModel requestModel)
         {
             using (var httpClient = new HttpClient())
             {
@@ -24,9 +91,9 @@ namespace MobileConnectDemo.Services.MobileConnect
 
                 var values = new Dictionary<string, string>
                 {
-                    { "Redirect_URL", requestModel.RedirectUrl },
-                    { "MSISDN", requestModel.PhoneNumber },
-                    { "correlation_id", requestModel.CorrelationId }
+                    {"Redirect_URL", requestModel.RedirectUrl},
+                    {"MSISDN", requestModel.PhoneNumber},
+                    {"correlation_id", requestModel.CorrelationId}
                 };
 
                 var content = new FormUrlEncodedContent(values);
@@ -45,13 +112,17 @@ namespace MobileConnectDemo.Services.MobileConnect
             }
         }
 
-        public async Task<string> SendOpenIdConfigurationRequest(string openIdConfigurationUrl)
+        private async Task<OpenIdConfigurationResponse> SendOpenIdConfigurationRequest(
+            OpenIdConfigurationRequestModel requestModel)
         {
             using (var httpClient = new HttpClient())
             {
-                var responseString = await httpClient.GetStringAsync(openIdConfigurationUrl);
+                var responseString = await httpClient.GetStringAsync(requestModel.OpenIdConfigurationUrl);
 
-                return responseString;
+                return new OpenIdConfigurationResponse
+                {
+                    JsonString = responseString
+                };
             }
         }
     }
