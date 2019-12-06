@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using MobileConnectDemo.Helpers;
 using MobileConnectDemo.Services.MobileConnect.Models;
 using Newtonsoft.Json;
 
@@ -33,7 +34,6 @@ namespace MobileConnectDemo.Services.MobileConnect
                 };
 
                 var discoveryResponse = await SendDiscoveryRequest(discoveryRequest);
-
                 if (discoveryResponse == null)
                 {
                     result.ErrorMessage = "Discovery Response is null";
@@ -49,7 +49,6 @@ namespace MobileConnectDemo.Services.MobileConnect
                 var openIdConfigurationUrl =
                     discoveryResponse.Model?.Response?.Apis?.OperatorId?.Links.FirstOrDefault(x =>
                         x.Rel == openIdConfigurationRel)?.Href;
-
                 if (string.IsNullOrEmpty(openIdConfigurationUrl))
                 {
                     result.ErrorMessage = "OpenId Configuration Url is null or empty";
@@ -64,7 +63,6 @@ namespace MobileConnectDemo.Services.MobileConnect
 
                 var openIdConfigurationResponse =
                     await SendOpenIdConfigurationRequest(openIdConfigurationRequestModel);
-
                 if (openIdConfigurationResponse == null)
                 {
                     result.ErrorMessage = "OpenId Configuration Response is null";
@@ -78,7 +76,6 @@ namespace MobileConnectDemo.Services.MobileConnect
 
                 var clientId =
                     discoveryResponse.Model?.Response?.ClientId;
-
                 if (string.IsNullOrEmpty(clientId))
                 {
                     result.ErrorMessage = "ClientId is null or empty";
@@ -88,7 +85,6 @@ namespace MobileConnectDemo.Services.MobileConnect
 
                 var audience =
                     openIdConfigurationResponse.Model?.Issuer;
-
                 if (string.IsNullOrEmpty(audience))
                 {
                     result.ErrorMessage = "Audience is null or empty";
@@ -96,19 +92,31 @@ namespace MobileConnectDemo.Services.MobileConnect
                     return result;
                 }
 
+                var siAuthorizationEndpoint =
+                    openIdConfigurationResponse.Model?.SiAuthorizationEndpoint;
+                if (string.IsNullOrEmpty(siAuthorizationEndpoint))
+                {
+                    result.ErrorMessage = "SI Authorization Endpoint is null or empty";
+
+                    return result;
+                }
+
                 var nonce = Guid.NewGuid().ToString();
                 var clientNotificationToken = Guid.NewGuid().ToString();
 
+                var responseType = "mc_si_async_code";
+                var scope = "openid mc_identity_phonenumber";
+
                 var siAuthorizeRequestModel = new SiAuthorizeRequestModel
                 {
-                    ResponseType = "mc_si_async_code",
+                    ResponseType = responseType,
                     ClientId = clientId,
-                    Scope = "openid mc_identity_phonenumber",
-                    RequestObjectClaims =  new SiAuthorizeRequestObjectClaims
+                    Scope = scope,
+                    RequestObjectClaims = new SiAuthorizeRequestObjectClaims
                     {
-                        ResponseType = "mc_si_async_code",
+                        ResponseType = responseType,
                         ClientId = clientId,
-                        Scope = "openid mc_identity_phonenumber",
+                        Scope = scope,
                         Nonce = nonce,
                         LoginHint = $"MSISDN:{settings.PhoneNumber}",
                         ArcValues = "3 2",
@@ -122,8 +130,7 @@ namespace MobileConnectDemo.Services.MobileConnect
                 };
 
                 var siAuthorizeResponse =
-                    await SendSiAuthorizeRequest(siAuthorizeRequestModel);
-
+                    await SendSiAuthorizeRequest(siAuthorizeRequestModel, siAuthorizationEndpoint);
                 if (siAuthorizeResponse == null)
                 {
                     result.ErrorMessage = "SI Authorize Response is null";
@@ -193,11 +200,32 @@ namespace MobileConnectDemo.Services.MobileConnect
         }
 
         private async Task<SiAuthorizeResponse> SendSiAuthorizeRequest(
-            SiAuthorizeRequestModel requestModel)
+            SiAuthorizeRequestModel requestModel, string siAuthorizationEndpoint)
         {
+            var privateRsaKey = "";
+
             using (var httpClient = new HttpClient())
             {
-                return new SiAuthorizeResponse();
+                var values = new Dictionary<string, object>
+                {
+                    {"response_type", requestModel.ResponseType},
+                    {"client_id", requestModel.ClientId},
+                    {"scope", requestModel.Scope},
+                    {"request", requestModel.RequestObjectClaims.ToJwtToken(privateRsaKey)}
+                };
+
+                var response = await httpClient.GetAsync(
+                    $"{siAuthorizationEndpoint}{values.ToQueryString()}");
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var responseModel = JsonConvert.DeserializeObject<SiAuthorizeResponseModel>(responseString);
+
+                return new SiAuthorizeResponse
+                {
+                    Model = responseModel,
+                    JsonString = responseString
+                };
             }
         }
     }

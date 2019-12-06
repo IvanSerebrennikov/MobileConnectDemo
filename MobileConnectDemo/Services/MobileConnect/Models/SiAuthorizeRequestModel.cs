@@ -1,4 +1,7 @@
-﻿namespace MobileConnectDemo.Services.MobileConnect.Models
+﻿using System.Collections.Generic;
+using MobileConnectDemo.Helpers;
+
+namespace MobileConnectDemo.Services.MobileConnect.Models
 {
     public class SiAuthorizeRequestModel
     {
@@ -36,5 +39,26 @@
         public string NotificationUri { get; set; }
 
         public string Version { get; set; }
+
+        public string ToJwtToken(string privateRsaKey)
+        {
+            var payload = new Dictionary<string, object>
+            {
+                {"response_type", ResponseType},
+                {"client_id", ClientId},
+                {"scope", Scope},
+                {"nonce", Nonce},
+                {"login_hint", LoginHint},
+                {"acr_values", ArcValues},
+                {"correlation_id", CorrelationId},
+                {"iss", Iss},
+                {"aud", Aud},
+                {"client_notification_token", ClientNotificationToken},
+                {"notification_uri", NotificationUri},
+                {"version", Version}
+            };
+
+            return payload.ToJwtToken(privateRsaKey);
+        }
     }
 }

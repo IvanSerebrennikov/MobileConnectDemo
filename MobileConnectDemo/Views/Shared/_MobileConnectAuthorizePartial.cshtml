@@ -35,4 +35,16 @@
             </div>
         </div>
     }
+
+    @if (Model.SiAuthorizeResponse != null)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">SI Authorize Response</h3>
+            </div>
+            <div class="panel-body">
+                <pre style="max-height: 500px;">@JToken.Parse(Model.SiAuthorizeResponse.JsonString).ToString(Newtonsoft.Json.Formatting.Indented)</pre>
+            </div>
+        </div>
+    }
 </div>
