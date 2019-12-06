@@ -119,8 +119,11 @@ namespace MobileConnectDemo.Services.MobileConnect
             {
                 var responseString = await httpClient.GetStringAsync(requestModel.OpenIdConfigurationUrl);
 
+                var responseModel = JsonConvert.DeserializeObject<OpenIdConfigurationResponseModel>(responseString);
+
                 return new OpenIdConfigurationResponse
                 {
+                    Model = responseModel,
                     JsonString = responseString
                 };
             }

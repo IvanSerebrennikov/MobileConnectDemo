@@ -7,7 +7,7 @@ namespace MobileConnectDemo.Services.MobileConnect.Models
 {
     public class OpenIdConfigurationResponse
     {
-        public OpenIdConfigurationRequestModel Model { get; set; }
+        public OpenIdConfigurationResponseModel Model { get; set; }
 
         public string JsonString { get; set; }
     }
