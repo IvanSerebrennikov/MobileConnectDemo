@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using MobileConnectDemo.Helpers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace MobileConnectDemo.Services.MobileConnect.Models
 {
@@ -52,13 +50,5 @@ namespace MobileConnectDemo.Services.MobileConnect.Models
 
         [JsonProperty("version")]
         public string Version { get; set; }
-
-        public string ToJwtToken(string privateRsaKey)
-        {
-            var json = JsonConvert.SerializeObject(this);
-            var payload = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-
-            return payload.ToJwtTokenWithRs256(privateRsaKey);
-        }
     }
 }

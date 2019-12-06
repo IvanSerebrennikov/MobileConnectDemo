@@ -77,7 +77,7 @@ namespace MobileConnectDemo.Services.MobileConnect
                     {"response_type", requestModel.ResponseType},
                     {"client_id", requestModel.ClientId},
                     {"scope", requestModel.Scope},
-                    {"request", requestModel.RequestObjectClaims.ToJwtToken(privateRsaKey)}
+                    {"request", requestModel.RequestObjectClaims.ToJwtTokenWithRs256(privateRsaKey)}
                 };
 
                 var response = await httpClient.GetAsync(
