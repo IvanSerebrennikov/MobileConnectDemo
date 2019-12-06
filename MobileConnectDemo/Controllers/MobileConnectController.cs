@@ -23,6 +23,7 @@ namespace MobileConnectDemo.Controllers
         {
             if (string.IsNullOrEmpty(model.PhoneNumber) ||
                 string.IsNullOrEmpty(model.RedirectUrl) ||
+                string.IsNullOrEmpty(model.NotificationUri) ||
                 string.IsNullOrEmpty(model.DiscoveryUrl) ||
                 string.IsNullOrEmpty(model.DiscoveryClientId) ||
                 string.IsNullOrEmpty(model.DiscoveryPassword))
@@ -32,6 +33,7 @@ namespace MobileConnectDemo.Controllers
             {
                 PhoneNumber = model.PhoneNumber,
                 RedirectUrl = model.RedirectUrl,
+                NotificationUri = model.NotificationUri,
                 DiscoveryUrl = model.DiscoveryUrl,
                 DiscoveryClientId = model.DiscoveryClientId,
                 DiscoveryPassword = model.DiscoveryPassword

@@ -11,6 +11,8 @@ namespace MobileConnectDemo.Models
 
         public string RedirectUrl { get; set; }
 
+        public string NotificationUri { get; set; }
+
         public string DiscoveryUrl { get; set; }
 
         public string DiscoveryClientId { get; set; }

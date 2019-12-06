@@ -11,6 +11,8 @@ namespace MobileConnectDemo.Services.MobileConnect.Models
 
         public OpenIdConfigurationResponse OpenIdConfigurationResponse { get; set; }
 
+        public SiAuthorizeResponse SiAuthorizeResponse { get; set; }
+
         public string ErrorMessage { get; set; }
     }
 }

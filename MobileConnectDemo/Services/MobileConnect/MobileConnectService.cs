@@ -20,6 +20,8 @@ namespace MobileConnectDemo.Services.MobileConnect
             {
                 var correlationId = Guid.NewGuid().ToString();
 
+                // Discovery:
+
                 var discoveryRequest = new DiscoveryRequestModel
                 {
                     PhoneNumber = settings.PhoneNumber,
@@ -40,6 +42,8 @@ namespace MobileConnectDemo.Services.MobileConnect
                 }
 
                 result.DiscoveryResponse = discoveryResponse;
+
+                // OpenIdConfiguration:
 
                 var openIdConfigurationRel = "openid-configuration";
                 var openIdConfigurationUrl =
@@ -69,6 +73,65 @@ namespace MobileConnectDemo.Services.MobileConnect
                 }
 
                 result.OpenIdConfigurationResponse = openIdConfigurationResponse;
+
+                // SiAuthorize:
+
+                var clientId =
+                    discoveryResponse.Model?.Response?.ClientId;
+
+                if (string.IsNullOrEmpty(clientId))
+                {
+                    result.ErrorMessage = "ClientId is null or empty";
+
+                    return result;
+                }
+
+                var audience =
+                    openIdConfigurationResponse.Model?.Issuer;
+
+                if (string.IsNullOrEmpty(audience))
+                {
+                    result.ErrorMessage = "Audience is null or empty";
+
+                    return result;
+                }
+
+                var nonce = Guid.NewGuid().ToString();
+                var clientNotificationToken = Guid.NewGuid().ToString();
+
+                var siAuthorizeRequestModel = new SiAuthorizeRequestModel
+                {
+                    ResponseType = "mc_si_async_code",
+                    ClientId = clientId,
+                    Scope = "openid mc_identity_phonenumber",
+                    RequestObjectClaims =  new SiAuthorizeRequestObjectClaims
+                    {
+                        ResponseType = "mc_si_async_code",
+                        ClientId = clientId,
+                        Scope = "openid mc_identity_phonenumber",
+                        Nonce = nonce,
+                        LoginHint = $"MSISDN:{settings.PhoneNumber}",
+                        ArcValues = "3 2",
+                        CorrelationId = correlationId,
+                        Iss = clientId,
+                        Aud = audience,
+                        ClientNotificationToken = clientNotificationToken,
+                        NotificationUri = settings.NotificationUri,
+                        Version = "mc_si_v2.0"
+                    }
+                };
+
+                var siAuthorizeResponse =
+                    await SendSiAuthorizeRequest(siAuthorizeRequestModel);
+
+                if (siAuthorizeResponse == null)
+                {
+                    result.ErrorMessage = "SI Authorize Response is null";
+
+                    return result;
+                }
+
+                result.SiAuthorizeResponse = siAuthorizeResponse;
             }
             catch (Exception e)
             {
@@ -126,6 +189,15 @@ namespace MobileConnectDemo.Services.MobileConnect
                     Model = responseModel,
                     JsonString = responseString
                 };
+            }
+        }
+
+        private async Task<SiAuthorizeResponse> SendSiAuthorizeRequest(
+            SiAuthorizeRequestModel requestModel)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                return new SiAuthorizeResponse();
             }
         }
     }

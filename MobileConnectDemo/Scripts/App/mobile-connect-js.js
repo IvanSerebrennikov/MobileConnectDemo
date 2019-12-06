@@ -10,6 +10,11 @@
         if (!redirectUrl)
             return;
 
+        var notificationUri = $("#mobileConnectAuthSetup #notificationUri").val();
+
+        if (!notificationUri)
+            return;
+
         var discoveryUrl = $("#mobileConnectAuthSetup #discoveryUrl").val();
 
         if (!discoveryUrl)
@@ -28,6 +33,7 @@
         var requestData = {
             phoneNumber: phoneNumber,
             redirectUrl: redirectUrl,
+            notificationUri: notificationUri,
             discoveryUrl: discoveryUrl,
             discoveryClientId: discoveryClientId,
             discoveryPassword: discoveryPassword

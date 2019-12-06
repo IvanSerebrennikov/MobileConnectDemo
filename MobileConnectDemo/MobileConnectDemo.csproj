@@ -137,6 +137,9 @@
     <Compile Include="Services\MobileConnect\Models\OpenIdConfigurationRequestModel.cs" />
     <Compile Include="Services\MobileConnect\Models\OpenIdConfigurationResponse.cs" />
     <Compile Include="Services\MobileConnect\Models\OpenIdConfigurationResponseModel.cs" />
+    <Compile Include="Services\MobileConnect\Models\SiAuthorizeRequestModel.cs" />
+    <Compile Include="Services\MobileConnect\Models\SiAuthorizeResponse.cs" />
+    <Compile Include="Services\MobileConnect\Models\SiAuthorizeResponseModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
