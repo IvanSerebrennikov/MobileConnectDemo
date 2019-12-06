@@ -12,7 +12,7 @@ namespace MobileConnectDemo.Helpers
 {
     public static class JwtHelper
     {
-        public static string ToJwtToken(this Dictionary<string, object> payload, string privateRsaKey)
+        public static string ToJwtTokenWithRs256(this Dictionary<string, object> payload, string privateRsaKey)
         {
             RSAParameters rsaParams;
 

@@ -26,7 +26,8 @@ namespace MobileConnectDemo.Controllers
                 string.IsNullOrEmpty(model.NotificationUri) ||
                 string.IsNullOrEmpty(model.DiscoveryUrl) ||
                 string.IsNullOrEmpty(model.DiscoveryClientId) ||
-                string.IsNullOrEmpty(model.DiscoveryPassword))
+                string.IsNullOrEmpty(model.DiscoveryPassword) ||
+                string.IsNullOrEmpty(model.PrivateRsaKeyPath))
                 return Content("Fill all fields");
 
             var authorizeSettings = new MobileConnectAuthorizeSettings
@@ -36,7 +37,8 @@ namespace MobileConnectDemo.Controllers
                 NotificationUri = model.NotificationUri,
                 DiscoveryUrl = model.DiscoveryUrl,
                 DiscoveryClientId = model.DiscoveryClientId,
-                DiscoveryPassword = model.DiscoveryPassword
+                DiscoveryPassword = model.DiscoveryPassword,
+                PrivateRsaKeyPath = model.PrivateRsaKeyPath
             };
 
             var authorizeResult = await _mobileConnectService.SiAuthorize(authorizeSettings);

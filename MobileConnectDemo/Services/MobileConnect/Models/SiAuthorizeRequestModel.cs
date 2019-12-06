@@ -58,7 +58,7 @@ namespace MobileConnectDemo.Services.MobileConnect.Models
                 {"version", Version}
             };
 
-            return payload.ToJwtToken(privateRsaKey);
+            return payload.ToJwtTokenWithRs256(privateRsaKey);
         }
     }
 }

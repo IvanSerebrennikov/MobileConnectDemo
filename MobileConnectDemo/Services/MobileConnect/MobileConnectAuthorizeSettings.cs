@@ -18,5 +18,7 @@ namespace MobileConnectDemo.Services.MobileConnect
         public string DiscoveryClientId { get; set; }
 
         public string DiscoveryPassword { get; set; }
+
+        public string PrivateRsaKeyPath { get; set; }
     }
 }

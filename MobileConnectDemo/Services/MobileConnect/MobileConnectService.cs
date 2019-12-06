@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -130,7 +131,7 @@ namespace MobileConnectDemo.Services.MobileConnect
                 };
 
                 var siAuthorizeResponse =
-                    await SendSiAuthorizeRequest(siAuthorizeRequestModel, siAuthorizationEndpoint);
+                    await SendSiAuthorizeRequest(siAuthorizeRequestModel, siAuthorizationEndpoint, settings.PrivateRsaKeyPath);
                 if (siAuthorizeResponse == null)
                 {
                     result.ErrorMessage = "SI Authorize Response is null";
@@ -200,9 +201,9 @@ namespace MobileConnectDemo.Services.MobileConnect
         }
 
         private async Task<SiAuthorizeResponse> SendSiAuthorizeRequest(
-            SiAuthorizeRequestModel requestModel, string siAuthorizationEndpoint)
+            SiAuthorizeRequestModel requestModel, string siAuthorizationEndpoint, string privateRsaKeyPath)
         {
-            var privateRsaKey = "";
+            var privateRsaKey = File.ReadAllText(privateRsaKeyPath);
 
             using (var httpClient = new HttpClient())
             {

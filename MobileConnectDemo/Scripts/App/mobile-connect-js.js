@@ -1,33 +1,31 @@
 ﻿$(function() {
     $("#mobileConnectAuthSetup").on("click", "#mobileConnectAuthSubmit", function () {
         var phoneNumber = $("#mobileConnectAuthSetup #phoneNumber").val();
-
         if (!phoneNumber)
             return;
 
         var redirectUrl = $("#mobileConnectAuthSetup #redirectUrl").val();
-
         if (!redirectUrl)
             return;
 
         var notificationUri = $("#mobileConnectAuthSetup #notificationUri").val();
-
         if (!notificationUri)
             return;
 
         var discoveryUrl = $("#mobileConnectAuthSetup #discoveryUrl").val();
-
         if (!discoveryUrl)
             return;
 
         var discoveryClientId = $("#mobileConnectAuthSetup #discoveryClientId").val();
-
         if (!discoveryClientId)
             return;
 
         var discoveryPassword = $("#mobileConnectAuthSetup #discoveryPassword").val();
-
         if (!discoveryPassword)
+            return;
+
+        var privateRsaKeyPath = $("#mobileConnectAuthSetup #privateRsaKeyPath").val();
+        if (!privateRsaKeyPath)
             return;
 
         var requestData = {
@@ -36,7 +34,8 @@
             notificationUri: notificationUri,
             discoveryUrl: discoveryUrl,
             discoveryClientId: discoveryClientId,
-            discoveryPassword: discoveryPassword
+            discoveryPassword: discoveryPassword,
+            privateRsaKeyPath: privateRsaKeyPath
         };
 
         $.post("/MobileConnect/Authorize", requestData)
