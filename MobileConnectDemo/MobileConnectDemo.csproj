@@ -135,13 +135,15 @@
     <Compile Include="Helpers\QueryStringHelper.cs" />
     <Compile Include="Models\MobileConnectAuthorizeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\MobileConnect\IMobileConnectService.cs" />
+    <Compile Include="Services\MobileConnect\Interfaces\IMobileConnectService.cs" />
+    <Compile Include="Services\MobileConnect\MobileConnectAuthorizeProcessor.cs" />
     <Compile Include="Services\MobileConnect\MobileConnectAuthorizeSettings.cs" />
+    <Compile Include="Services\MobileConnect\MobileConnectClient.cs" />
     <Compile Include="Services\MobileConnect\Models\DiscoveryRequestModel.cs" />
     <Compile Include="Services\MobileConnect\MobileConnectService.cs" />
     <Compile Include="Services\MobileConnect\Models\DiscoveryResponse.cs" />
     <Compile Include="Services\MobileConnect\Models\DiscoveryResponseModel.cs" />
-    <Compile Include="Services\MobileConnect\Models\MobileConnectAuthorizeResult.cs" />
+    <Compile Include="Services\MobileConnect\MobileConnectAuthorizeResult.cs" />
     <Compile Include="Services\MobileConnect\Models\OpenIdConfigurationRequestModel.cs" />
     <Compile Include="Services\MobileConnect\Models\OpenIdConfigurationResponse.cs" />
     <Compile Include="Services\MobileConnect\Models\OpenIdConfigurationResponseModel.cs" />

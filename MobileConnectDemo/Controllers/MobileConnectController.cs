@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using MobileConnectDemo.Models;
 using MobileConnectDemo.Services.MobileConnect;
+using MobileConnectDemo.Services.MobileConnect.Interfaces;
 using MobileConnectDemo.Services.MobileConnect.Models;
 using Newtonsoft.Json;
 
