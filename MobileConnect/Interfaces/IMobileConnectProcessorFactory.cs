@@ -1,6 +1,6 @@
 ﻿namespace MobileConnect.Interfaces
 {
-    public interface IMobileConnectProcessorsFactory
+    public interface IMobileConnectProcessorFactory
     {
         IMobileConnectProcessor<TResult, TSettings> CreateProcessor<TProcessor, TResult, TSettings>(
             MobileConnectClient client, TSettings settings)

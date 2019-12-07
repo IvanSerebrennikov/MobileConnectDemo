@@ -54,12 +54,12 @@
     <Compile Include="Helpers\JwtHelper.cs" />
     <Compile Include="Helpers\QueryStringHelper.cs" />
     <Compile Include="Interfaces\IMobileConnectProcessorSettings.cs" />
-    <Compile Include="Interfaces\IMobileConnectProcessorsFactory.cs" />
+    <Compile Include="Interfaces\IMobileConnectProcessorFactory.cs" />
     <Compile Include="Interfaces\IMobileConnectProcessor.cs" />
     <Compile Include="Interfaces\IMobileConnectProcessResult.cs" />
     <Compile Include="Interfaces\IMobileConnectService.cs" />
     <Compile Include="MobileConnectClient.cs" />
-    <Compile Include="MobileConnectDefaultProcessorsFactory.cs" />
+    <Compile Include="MobileConnectDefaultProcessorFactory.cs" />
     <Compile Include="Models\Discovery\DiscoveryRequestModel.cs" />
     <Compile Include="Models\Discovery\DiscoveryResponse.cs" />
     <Compile Include="Models\Discovery\DiscoveryResponseModel.cs" />

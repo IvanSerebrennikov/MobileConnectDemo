@@ -8,13 +8,13 @@ namespace MobileConnect.Services
     {
         private readonly MobileConnectClient _client;
 
-        private readonly IMobileConnectProcessorsFactory _processorsFactory;
+        private readonly IMobileConnectProcessorFactory _processorsFactory;
 
         public MobileConnectService()
         {
             // TODO: Get from ctor DI
             _client = new MobileConnectClient();
-            _processorsFactory = new MobileConnectDefaultProcessorsFactory();
+            _processorsFactory = new MobileConnectDefaultProcessorFactory();
         }
 
         public async Task<MobileConnectSiAuthorizeResult> SiAuthorize(MobileConnectSiAuthorizeSettings settings)

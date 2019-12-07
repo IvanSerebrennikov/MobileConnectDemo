@@ -7,7 +7,7 @@ using MobileConnect.Interfaces;
 
 namespace MobileConnect
 {
-    public class MobileConnectDefaultProcessorsFactory : IMobileConnectProcessorsFactory
+    public class MobileConnectDefaultProcessorFactory : IMobileConnectProcessorFactory
     {
         public IMobileConnectProcessor<TResult, TSettings> CreateProcessor<TProcessor, TResult, TSettings>(MobileConnectClient client, TSettings settings)
             where TProcessor : IMobileConnectProcessor<TResult, TSettings>, new()
