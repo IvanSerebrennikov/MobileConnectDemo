@@ -53,8 +53,13 @@
   <ItemGroup>
     <Compile Include="Helpers\JwtHelper.cs" />
     <Compile Include="Helpers\QueryStringHelper.cs" />
-    <Compile Include="Interfaces\Services\IMobileConnectService.cs" />
+    <Compile Include="Interfaces\IMobileConnectProcessorSettings.cs" />
+    <Compile Include="Interfaces\IMobileConnectProcessorsFactory.cs" />
+    <Compile Include="Interfaces\IMobileConnectProcessor.cs" />
+    <Compile Include="Interfaces\IMobileConnectProcessResult.cs" />
+    <Compile Include="Interfaces\IMobileConnectService.cs" />
     <Compile Include="MobileConnectClient.cs" />
+    <Compile Include="MobileConnectDefaultProcessorsFactory.cs" />
     <Compile Include="Models\Discovery\DiscoveryRequestModel.cs" />
     <Compile Include="Models\Discovery\DiscoveryResponse.cs" />
     <Compile Include="Models\Discovery\DiscoveryResponseModel.cs" />
@@ -73,8 +78,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\Processors\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using MobileConnect.Interfaces.Services;
+using MobileConnect.Interfaces;
 using MobileConnect.Processors.SiAuthorize;
 using MobileConnect.Services;
 using MobileConnectDemo.Models;
@@ -16,6 +16,7 @@ namespace MobileConnectDemo.Controllers
 
         public MobileConnectController()
         {
+            // TODO: Get from ctor DI
             _mobileConnectService = new MobileConnectService();
         }
 

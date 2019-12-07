@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MobileConnect.Interfaces;
 using MobileConnect.Models.Discovery;
 using MobileConnect.Models.OpenIdConfiguration;
 using MobileConnect.Models.SiAuthorize;
 
 namespace MobileConnect.Processors.SiAuthorize
 {
-    public class MobileConnectSiAuthorizeProcessor
+    public class MobileConnectSiAuthorizeProcessor : IMobileConnectProcessor<MobileConnectSiAuthorizeResult, MobileConnectSiAuthorizeSettings>
     {
         private readonly MobileConnectSiAuthorizeResult _result = new MobileConnectSiAuthorizeResult();
 
-        private readonly MobileConnectClient _client;
+        private MobileConnectClient _client;
 
-        private readonly MobileConnectSiAuthorizeSettings _settings;
+        private MobileConnectSiAuthorizeSettings _settings;
 
         public string CorrelationId { get; }
 
@@ -25,11 +26,27 @@ namespace MobileConnect.Processors.SiAuthorize
 
         private string SiAuthorizationEndpoint { get; set; }
 
-        public MobileConnectSiAuthorizeProcessor(MobileConnectClient client, MobileConnectSiAuthorizeSettings settings)
+        public MobileConnectSiAuthorizeProcessor()
         {
-            _client = client;
-            _settings = settings;
             CorrelationId = Guid.NewGuid().ToString();
+        }
+
+        public bool SetClient(MobileConnectClient client)
+        {
+            if (_client != null) 
+                return false;
+
+            _client = client;
+            return true;
+        }
+
+        public bool SetSettings(MobileConnectSiAuthorizeSettings settings)
+        {
+            if (_settings != null) 
+                return false;
+
+            _settings = settings;
+            return true;
         }
 
         public async Task<MobileConnectSiAuthorizeResult> Process()

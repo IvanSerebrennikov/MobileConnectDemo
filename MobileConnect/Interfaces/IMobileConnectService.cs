@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MobileConnect.Processors.SiAuthorize;
 
-namespace MobileConnect.Interfaces.Services
+namespace MobileConnect.Interfaces
 {
     public interface IMobileConnectService
     {

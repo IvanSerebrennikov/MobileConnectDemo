@@ -1,10 +1,11 @@
-﻿using MobileConnect.Models.Discovery;
+﻿using MobileConnect.Interfaces;
+using MobileConnect.Models.Discovery;
 using MobileConnect.Models.OpenIdConfiguration;
 using MobileConnect.Models.SiAuthorize;
 
 namespace MobileConnect.Processors.SiAuthorize
 {
-    public class MobileConnectSiAuthorizeResult
+    public class MobileConnectSiAuthorizeResult : IMobileConnectProcessResult
     {
         public DiscoveryResponse DiscoveryResponse { get; set; }
 

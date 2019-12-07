@@ -1,6 +1,8 @@
-﻿namespace MobileConnect.Processors.SiAuthorize
+﻿using MobileConnect.Interfaces;
+
+namespace MobileConnect.Processors.SiAuthorize
 {
-    public class MobileConnectSiAuthorizeSettings
+    public class MobileConnectSiAuthorizeSettings : IMobileConnectProcessorSettings
     {
         public string PhoneNumber { get; set; }
 
