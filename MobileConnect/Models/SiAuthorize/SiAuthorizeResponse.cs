@@ -1,4 +1,4 @@
-﻿namespace MobileConnectDemo.Services.MobileConnect.Models
+﻿namespace MobileConnect.Models.SiAuthorize
 {
     public class SiAuthorizeResponse
     {

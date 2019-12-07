@@ -5,11 +5,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using MobileConnectDemo.Helpers;
-using MobileConnectDemo.Services.MobileConnect.Models;
+using MobileConnect.Helpers;
+using MobileConnect.Models.Discovery;
+using MobileConnect.Models.OpenIdConfiguration;
+using MobileConnect.Models.SiAuthorize;
 using Newtonsoft.Json;
 
-namespace MobileConnectDemo.Services.MobileConnect
+namespace MobileConnect
 {
     public class MobileConnectClient
     {

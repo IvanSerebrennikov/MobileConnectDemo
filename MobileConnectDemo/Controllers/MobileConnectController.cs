@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using MobileConnect.Interfaces.Services;
+using MobileConnect.Processors.SiAuthorize;
+using MobileConnect.Services;
 using MobileConnectDemo.Models;
-using MobileConnectDemo.Services.MobileConnect;
-using MobileConnectDemo.Services.MobileConnect.Interfaces;
-using MobileConnectDemo.Services.MobileConnect.Models;
 using Newtonsoft.Json;
 
 namespace MobileConnectDemo.Controllers
@@ -31,7 +31,7 @@ namespace MobileConnectDemo.Controllers
                 string.IsNullOrEmpty(model.PrivateRsaKeyPath))
                 return Content("Fill all fields");
 
-            var authorizeSettings = new MobileConnectAuthorizeSettings
+            var authorizeSettings = new MobileConnectSiAuthorizeSettings
             {
                 PhoneNumber = model.PhoneNumber,
                 RedirectUrl = model.RedirectUrl,

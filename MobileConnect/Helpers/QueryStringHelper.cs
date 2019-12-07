@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace MobileConnectDemo.Helpers
+namespace MobileConnect.Helpers
 {
     public static class QueryStringHelper
     {
