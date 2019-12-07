@@ -4,6 +4,10 @@ namespace MobileConnect.Models.SiAuthorize
 {
     public class SiAuthorizeRequestModel
     {
+        public string SiAuthorizationUrl { get; set; }
+
+        public string PrivateRsaKeyPath { get; set; }
+
         public string ResponseType { get; set; }
 
         public string ClientId { get; set; }

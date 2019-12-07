@@ -68,9 +68,9 @@ namespace MobileConnect
         }
 
         public async Task<SiAuthorizeResponse> SendSiAuthorizeRequest(
-            SiAuthorizeRequestModel requestModel, string siAuthorizationEndpoint, string privateRsaKeyPath)
+            SiAuthorizeRequestModel requestModel)
         {
-            var privateRsaKey = File.ReadAllText(privateRsaKeyPath);
+            var privateRsaKey = File.ReadAllText(requestModel.PrivateRsaKeyPath);
 
             using (var httpClient = new HttpClient())
             {
@@ -83,7 +83,7 @@ namespace MobileConnect
                 };
 
                 var response = await httpClient.GetAsync(
-                    $"{siAuthorizationEndpoint}{values.ToQueryString()}");
+                    $"{requestModel.SiAuthorizationUrl}{values.ToQueryString()}");
 
                 var responseString = await response.Content.ReadAsStringAsync();
 

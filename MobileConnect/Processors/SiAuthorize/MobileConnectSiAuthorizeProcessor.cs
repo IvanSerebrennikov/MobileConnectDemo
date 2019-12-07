@@ -151,6 +151,8 @@ namespace MobileConnect.Processors.SiAuthorize
 
             var siAuthorizeRequestModel = new SiAuthorizeRequestModel
             {
+                SiAuthorizationUrl = SiAuthorizationEndpoint,
+                PrivateRsaKeyPath = _settings.PrivateRsaKeyPath,
                 ResponseType = responseType,
                 ClientId = ClientId,
                 Scope = scope,
@@ -172,7 +174,7 @@ namespace MobileConnect.Processors.SiAuthorize
             };
 
             var siAuthorizeResponse =
-                await _client.SendSiAuthorizeRequest(siAuthorizeRequestModel, SiAuthorizationEndpoint, _settings.PrivateRsaKeyPath);
+                await _client.SendSiAuthorizeRequest(siAuthorizeRequestModel);
             if (siAuthorizeResponse == null)
             {
                 _result.ErrorMessage = "SI Authorize Response is null";
