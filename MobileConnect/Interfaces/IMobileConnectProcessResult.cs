@@ -8,5 +8,6 @@ namespace MobileConnect.Interfaces
 {
     public interface IMobileConnectProcessResult
     {
+        string ErrorMessage { get; set; }
     }
 }

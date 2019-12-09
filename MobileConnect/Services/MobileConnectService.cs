@@ -21,10 +21,9 @@ namespace MobileConnect.Services
         {
             var processor =
                 _processorsFactory
-                    .CreateProcessor<MobileConnectSiAuthorizeProcessor, MobileConnectSiAuthorizeResult,
-                        MobileConnectSiAuthorizeSettings>(_client, settings);
+                    .CreateProcessor<MobileConnectSiAuthorizeProcessor>(_client, settings);
 
-            var result = await processor.Process();
+            var result = await processor.ProcessAndGetResult() as MobileConnectSiAuthorizeResult;
 
             return result;
         }

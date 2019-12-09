@@ -2,10 +2,8 @@
 {
     public interface IMobileConnectProcessorFactory
     {
-        IMobileConnectProcessor<TResult, TSettings> CreateProcessor<TProcessor, TResult, TSettings>(
-            MobileConnectClient client, TSettings settings)
-            where TProcessor : IMobileConnectProcessor<TResult, TSettings>, new()
-            where TResult : IMobileConnectProcessResult
-            where TSettings : IMobileConnectProcessorSettings;
+        IMobileConnectProcessor CreateProcessor<TProcessor>(
+            MobileConnectClient client, IMobileConnectProcessorSettings settings)
+            where TProcessor : IMobileConnectProcessor, new();
     }
 }

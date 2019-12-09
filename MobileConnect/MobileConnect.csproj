@@ -69,6 +69,7 @@
     <Compile Include="Models\SiAuthorize\SiAuthorizeRequestModel.cs" />
     <Compile Include="Models\SiAuthorize\SiAuthorizeResponse.cs" />
     <Compile Include="Models\SiAuthorize\SiAuthorizeResponseModel.cs" />
+    <Compile Include="Processors\Base\MobileConnectProcessor.cs" />
     <Compile Include="Processors\SiAuthorize\MobileConnectSiAuthorizeProcessor.cs" />
     <Compile Include="Processors\SiAuthorize\MobileConnectSiAuthorizeResult.cs" />
     <Compile Include="Processors\SiAuthorize\MobileConnectSiAuthorizeSettings.cs" />

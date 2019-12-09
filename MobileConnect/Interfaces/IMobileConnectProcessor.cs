@@ -2,14 +2,12 @@
 
 namespace MobileConnect.Interfaces
 {
-    public interface IMobileConnectProcessor<TResult, TSettings>
-        where TResult : IMobileConnectProcessResult
-        where TSettings : IMobileConnectProcessorSettings
+    public interface IMobileConnectProcessor
     {
-        bool SetClient(MobileConnectClient client);
+        void SetClient(MobileConnectClient client);
 
-        bool SetSettings(TSettings settings);
+        void SetSettings(IMobileConnectProcessorSettings settings);
 
-        Task<TResult> Process();
+        Task<IMobileConnectProcessResult> ProcessAndGetResult();
     }
 }
