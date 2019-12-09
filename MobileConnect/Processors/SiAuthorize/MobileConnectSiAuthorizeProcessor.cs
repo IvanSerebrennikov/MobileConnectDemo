@@ -8,17 +8,10 @@ using MobileConnect.Processors.Base;
 
 namespace MobileConnect.Processors.SiAuthorize
 {
-    public class MobileConnectSiAuthorizeProcessor : MobileConnectProcessor<MobileConnectSiAuthorizeResult, MobileConnectSiAuthorizeSettings>
+    public class MobileConnectSiAuthorizeProcessor : MobileConnectProcessor<MobileConnectSiAuthorizeResult,
+        MobileConnectSiAuthorizeSettings>
     {
         public string CorrelationId { get; }
-
-        private string OpenIdConfigurationUrl { get; set; }
-
-        private string ClientId { get; set; }
-
-        private string Audience { get; set; }
-
-        private string SiAuthorizationEndpoint { get; set; }
 
         public MobileConnectSiAuthorizeProcessor()
         {
@@ -27,18 +20,22 @@ namespace MobileConnect.Processors.SiAuthorize
 
         protected override async Task Process()
         {
-            await ProcessDiscovery();
-            await ProcessOpenIdConfiguration();
-            await ProcessSiAuthorize();
+            var (openIdConfigurationUrl, clientId) = await ProcessDiscovery();
+
+            var (audience, siAuthorizationEndpoint) = await ProcessOpenIdConfiguration(openIdConfigurationUrl);
+
+            await ProcessSiAuthorize(clientId, audience, siAuthorizationEndpoint);
         }
 
-        private async Task ProcessDiscovery()
+        private async Task<(string openIdConfigurationUrl, string clientId)> ProcessDiscovery()
         {
+            var emptyResult = ("", "");
+
             if (!string.IsNullOrEmpty(Result.ErrorMessage))
-                return;
+                return emptyResult;
 
             if (string.IsNullOrEmpty(CorrelationId))
-                return;
+                return emptyResult;
 
             var discoveryRequest = new DiscoveryRequestModel
             {
@@ -54,30 +51,35 @@ namespace MobileConnect.Processors.SiAuthorize
             if (discoveryResponse == null)
             {
                 Result.ErrorMessage = "Discovery Response is null";
-                return;
+                return emptyResult;
             }
 
             Result.DiscoveryResponse = discoveryResponse;
 
-            if (!TryToSetOpenIdConfigurationUrl(discoveryResponse))
-                return;
+            if (!TryGetOpenIdConfigurationUrl(discoveryResponse, out var openIdConfigurationUrl))
+                return emptyResult;
 
-            if (!TryToSetClientId(discoveryResponse))
-                return;
+            if (!TryGetClientId(discoveryResponse, out var clientId))
+                return emptyResult;
+
+            return (openIdConfigurationUrl, clientId);
         }
 
-        private async Task ProcessOpenIdConfiguration()
+        private async Task<(string audience, string siAuthorizationEndpoint)> ProcessOpenIdConfiguration(
+            string openIdConfigurationUrl)
         {
+            var emptyResult = ("", "");
+
             if (!string.IsNullOrEmpty(Result.ErrorMessage))
-                return;
+                return emptyResult;
 
             if (string.IsNullOrEmpty(CorrelationId) ||
-                string.IsNullOrEmpty(OpenIdConfigurationUrl))
-                return;
+                string.IsNullOrEmpty(openIdConfigurationUrl))
+                return emptyResult;
 
             var openIdConfigurationRequestModel = new OpenIdConfigurationRequestModel
             {
-                OpenIdConfigurationUrl = OpenIdConfigurationUrl
+                OpenIdConfigurationUrl = openIdConfigurationUrl
             };
 
             var openIdConfigurationResponse =
@@ -85,27 +87,29 @@ namespace MobileConnect.Processors.SiAuthorize
             if (openIdConfigurationResponse == null)
             {
                 Result.ErrorMessage = "OpenId Configuration Response is null";
-                return;
+                return emptyResult;
             }
 
             Result.OpenIdConfigurationResponse = openIdConfigurationResponse;
 
-            if (!TryToSetAudience(openIdConfigurationResponse))
-                return;
+            if (!TryGetAudience(openIdConfigurationResponse, out var audience))
+                return emptyResult;
 
-            if (!TryToSetSiAuthorizationEndpoint(openIdConfigurationResponse))
-                return;
+            if (!TryGetSiAuthorizationEndpoint(openIdConfigurationResponse, out var siAuthorizationEndpoint))
+                return emptyResult;
+
+            return (audience, siAuthorizationEndpoint);
         }
 
-        private async Task ProcessSiAuthorize()
+        private async Task ProcessSiAuthorize(string clientId, string audience, string siAuthorizationEndpoint)
         {
             if (!string.IsNullOrEmpty(Result.ErrorMessage))
                 return;
 
             if (string.IsNullOrEmpty(CorrelationId) ||
-                string.IsNullOrEmpty(ClientId) ||
-                string.IsNullOrEmpty(Audience) ||
-                string.IsNullOrEmpty(SiAuthorizationEndpoint))
+                string.IsNullOrEmpty(clientId) ||
+                string.IsNullOrEmpty(audience) ||
+                string.IsNullOrEmpty(siAuthorizationEndpoint))
                 return;
 
             var nonce = Guid.NewGuid().ToString();
@@ -118,22 +122,22 @@ namespace MobileConnect.Processors.SiAuthorize
 
             var siAuthorizeRequestModel = new SiAuthorizeRequestModel
             {
-                SiAuthorizationUrl = SiAuthorizationEndpoint,
+                SiAuthorizationUrl = siAuthorizationEndpoint,
                 PrivateRsaKeyPath = Settings.PrivateRsaKeyPath,
                 ResponseType = responseType,
-                ClientId = ClientId,
+                ClientId = clientId,
                 Scope = scope,
                 RequestObjectClaims = new SiAuthorizeRequestObjectClaims
                 {
                     ResponseType = responseType,
-                    ClientId = ClientId,
+                    ClientId = clientId,
                     Scope = scope,
                     Nonce = nonce,
                     LoginHint = $"MSISDN:{Settings.PhoneNumber}",
                     ArcValues = "3 2",
                     CorrelationId = CorrelationId,
-                    Iss = ClientId,
-                    Aud = Audience,
+                    Iss = clientId,
+                    Aud = audience,
                     ClientNotificationToken = clientNotificationToken,
                     NotificationUri = Settings.NotificationUri,
                     Version = version
@@ -151,63 +155,64 @@ namespace MobileConnect.Processors.SiAuthorize
             Result.SiAuthorizeResponse = siAuthorizeResponse;
         }
 
-        private bool TryToSetOpenIdConfigurationUrl(DiscoveryResponse discoveryResponse)
+        private bool TryGetOpenIdConfigurationUrl(DiscoveryResponse discoveryResponse,
+            out string openIdConfigurationUrl)
         {
             var openIdConfigurationRel = "openid-configuration";
-            var openIdConfigurationUrl =
+
+            openIdConfigurationUrl =
                 discoveryResponse.Model?.Response?.Apis?.OperatorId?.Links.FirstOrDefault(x =>
                     x.Rel == openIdConfigurationRel)?.Href;
+
             if (string.IsNullOrEmpty(openIdConfigurationUrl))
             {
                 Result.ErrorMessage = "OpenId Configuration Url is null or empty";
                 return false;
             }
 
-            OpenIdConfigurationUrl = openIdConfigurationUrl;
             return true;
         }
 
-        private bool TryToSetClientId(DiscoveryResponse discoveryResponse)
+        private bool TryGetClientId(DiscoveryResponse discoveryResponse, 
+            out string clientId)
         {
-            var clientId =
+            clientId =
                 discoveryResponse.Model?.Response?.ClientId;
+
             if (string.IsNullOrEmpty(clientId))
             {
                 Result.ErrorMessage = "ClientId is null or empty";
                 return false;
             }
 
-            ClientId = clientId;
-
             return true;
         }
 
-        private bool TryToSetAudience(OpenIdConfigurationResponse openIdConfigurationResponse)
+        private bool TryGetAudience(OpenIdConfigurationResponse openIdConfigurationResponse, 
+            out string audience)
         {
-            var audience =
+            audience =
                 openIdConfigurationResponse.Model?.Issuer;
+
             if (string.IsNullOrEmpty(audience))
             {
                 Result.ErrorMessage = "Audience is null or empty";
                 return false;
             }
 
-            Audience = audience;
-
             return true;
         }
 
-        private bool TryToSetSiAuthorizationEndpoint(OpenIdConfigurationResponse openIdConfigurationResponse)
+        private bool TryGetSiAuthorizationEndpoint(OpenIdConfigurationResponse openIdConfigurationResponse,
+            out string siAuthorizationEndpoint)
         {
-            var siAuthorizationEndpoint =
+            siAuthorizationEndpoint =
                 openIdConfigurationResponse.Model?.SiAuthorizationEndpoint;
             if (string.IsNullOrEmpty(siAuthorizationEndpoint))
             {
                 Result.ErrorMessage = "SI Authorization Endpoint is null or empty";
                 return false;
             }
-
-            SiAuthorizationEndpoint = siAuthorizationEndpoint;
 
             return true;
         }
