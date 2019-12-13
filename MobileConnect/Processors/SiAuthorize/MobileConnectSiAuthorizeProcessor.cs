@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using MobileConnect.Models.Discovery;
 using MobileConnect.Models.OpenIdConfiguration;
@@ -117,8 +118,9 @@ namespace MobileConnect.Processors.SiAuthorize
 
             var responseType = "mc_si_async_code";
             var scope = "openid mc_identity_phonenumber";
-
-            var version = "mc_si_v2.0";
+            var acrValues = "3 2";
+            var loginHint = WebUtility.UrlEncode($"MSISDN:{Settings.PhoneNumber}");
+            var version = "mc_si_r2_v1.0";
 
             var siAuthorizeRequestModel = new SiAuthorizeRequestModel
             {
@@ -131,10 +133,9 @@ namespace MobileConnect.Processors.SiAuthorize
                 {
                     ResponseType = responseType,
                     ClientId = clientId,
-                    Scope = scope,
                     Nonce = nonce,
-                    LoginHint = $"MSISDN:{Settings.PhoneNumber}",
-                    ArcValues = "3 2",
+                    LoginHint = loginHint,
+                    AcrValues = acrValues,
                     CorrelationId = CorrelationId,
                     Iss = clientId,
                     Aud = audience,

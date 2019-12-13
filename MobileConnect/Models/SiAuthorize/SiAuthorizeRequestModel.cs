@@ -19,14 +19,11 @@ namespace MobileConnect.Models.SiAuthorize
 
     public class SiAuthorizeRequestObjectClaims
     {
-        [JsonProperty("response_type")]
-        public string ResponseType { get; set; }
-
         [JsonProperty("client_id")]
         public string ClientId { get; set; }
 
-        [JsonProperty("scope")]
-        public string Scope { get; set; }
+        [JsonProperty("response_type")]
+        public string ResponseType { get; set; }
 
         [JsonProperty("nonce")]
         public string Nonce { get; set; }
@@ -35,7 +32,7 @@ namespace MobileConnect.Models.SiAuthorize
         public string LoginHint { get; set; }
 
         [JsonProperty("acr_values")]
-        public string ArcValues { get; set; }
+        public string AcrValues { get; set; }
 
         [JsonProperty("correlation_id")]
         public string CorrelationId { get; set; }
