@@ -117,7 +117,7 @@ namespace MobileConnect.Processors.SiAuthorize
             var clientNotificationToken = Guid.NewGuid().ToString();
 
             var responseType = "mc_si_async_code";
-            var scope = "openid mc_identity_phonenumber";
+            var scope = "openid mc_authn";
             var acrValues = "3 2";
             var loginHint = WebUtility.UrlEncode($"MSISDN:{Settings.PhoneNumber}");
             var version = "mc_si_r2_v1.0";
