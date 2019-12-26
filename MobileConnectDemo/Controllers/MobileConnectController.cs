@@ -104,7 +104,51 @@ namespace MobileConnectDemo.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
             }
 
+            ValidateNotifyRequestAuthorization(mobileConnectRequest.ClientNotificationToken, out var authErrorMessage);
+
+            if (!string.IsNullOrEmpty(authErrorMessage))
+            {
+                MobileConnectNotifyLogger.Warn(
+                    $"Notify [{notifyGuid}]. {authErrorMessage}");
+
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, authErrorMessage);
+            }
+
             return new HttpStatusCodeResult(HttpStatusCode.NoContent);
+        }
+
+        private void ValidateNotifyRequestAuthorization(
+            string clientNotificationToken, out string authErrorMessage)
+        {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (string.IsNullOrEmpty(authHeader))
+            {
+                authErrorMessage = "Authorization header is null or empty";
+                return;
+            }
+
+            var authHeaderParts = authHeader.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries);
+
+            if (authHeaderParts.Length != 2)
+            {
+                authErrorMessage = "Authorization header is incorrect";
+                return;
+            }
+
+            if (authHeaderParts[0] != "Bearer")
+            {
+                authErrorMessage = "Authorization header scheme is incorrect";
+                return;
+            }
+
+            if (authHeaderParts[1] != clientNotificationToken)
+            {
+                authErrorMessage = "Authorization header value is incorrect";
+                return;
+            }
+
+            authErrorMessage = "";
         }
 
         private MobileConnectNotifyModel ValidateNotifyRequestAndGetMobileConnectNotifyModel(
