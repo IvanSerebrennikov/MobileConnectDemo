@@ -5,6 +5,8 @@ using System.Web.Mvc;
 using MobileConnect.Interfaces;
 using MobileConnect.Processors.SiAuthorize;
 using MobileConnect.Services;
+using MobileConnectDemo.DataAccess;
+using MobileConnectDemo.DataAccess.Entities;
 using MobileConnectDemo.Models;
 using Newtonsoft.Json;
 
@@ -14,10 +16,13 @@ namespace MobileConnectDemo.Controllers
     {
         private readonly IMobileConnectService _mobileConnectService;
 
+        private readonly Repository _repository;
+
         public MobileConnectController()
         {
             // TODO: Get from ctor DI
             _mobileConnectService = new MobileConnectService();
+            _repository = new Repository();
         }
 
         [HttpPost]
@@ -44,6 +49,24 @@ namespace MobileConnectDemo.Controllers
             };
 
             var authorizeResult = await _mobileConnectService.SiAuthorize(authorizeSettings);
+
+            if (!authorizeResult.IsSucceeded)
+            {
+                // TODO: Log authorizeResult.ToString()
+            }
+
+            var mobileConnectRequest = new MobileConnectAuthorizeRequest
+            {
+                PhoneNumber = model.PhoneNumber,
+                ClientNotificationToken = authorizeResult.ClientNotificationToken,
+                AuthReqId = authorizeResult.AuthReqId,
+                CorrelationId = authorizeResult.CorrelationId,
+                Nonce = authorizeResult.Nonce,
+                IsResponseSucceeded = authorizeResult.IsSucceeded,
+                ResponseErrorMessage = authorizeResult.ErrorMessage
+            };
+
+            _repository.CreateMobileConnectAuthorizeRequest(mobileConnectRequest);
 
             return PartialView("_MobileConnectAuthorizePartial", authorizeResult);
         }

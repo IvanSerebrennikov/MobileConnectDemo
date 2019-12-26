@@ -60,7 +60,7 @@ namespace MobileConnect.Processors.Base
             }
             catch (Exception e)
             {
-                Result.ErrorMessage = e.Message;
+                Result.ErrorMessage = $"Exception! Message: {e.Message}; Inner: {e.InnerException?.Message}";
             }
 
             return Result;

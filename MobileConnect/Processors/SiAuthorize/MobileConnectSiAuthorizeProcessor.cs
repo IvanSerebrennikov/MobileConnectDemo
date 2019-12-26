@@ -12,11 +12,13 @@ namespace MobileConnect.Processors.SiAuthorize
     public class MobileConnectSiAuthorizeProcessor : MobileConnectProcessor<MobileConnectSiAuthorizeResult,
         MobileConnectSiAuthorizeSettings>
     {
-        public string CorrelationId { get; }
+        private readonly string _correlationId;
 
         public MobileConnectSiAuthorizeProcessor()
         {
-            CorrelationId = Guid.NewGuid().ToString();
+            _correlationId = Guid.NewGuid().ToString();
+
+            Result.CorrelationId = _correlationId;
         }
 
         protected override async Task Process()
@@ -25,7 +27,7 @@ namespace MobileConnect.Processors.SiAuthorize
 
             var (audience, siAuthorizationEndpoint) = await ProcessOpenIdConfiguration(openIdConfigurationUrl);
 
-            var authReqId = await ProcessSiAuthorize(clientId, audience, siAuthorizationEndpoint);
+            await ProcessSiAuthorize(clientId, audience, siAuthorizationEndpoint);
         }
 
         private async Task<(string openIdConfigurationUrl, string clientId)> ProcessDiscovery()
@@ -35,7 +37,7 @@ namespace MobileConnect.Processors.SiAuthorize
             if (!string.IsNullOrEmpty(Result.ErrorMessage))
                 return emptyResult;
 
-            if (string.IsNullOrEmpty(CorrelationId))
+            if (string.IsNullOrEmpty(_correlationId))
                 return emptyResult;
 
             var discoveryRequest = new DiscoveryRequestModel
@@ -45,7 +47,7 @@ namespace MobileConnect.Processors.SiAuthorize
                 DiscoveryUrl = Settings.DiscoveryUrl,
                 DiscoveryClientId = Settings.DiscoveryClientId,
                 DiscoveryPassword = Settings.DiscoveryPassword,
-                CorrelationId = CorrelationId
+                CorrelationId = _correlationId
             };
 
             var discoveryResponse = await Client.SendDiscoveryRequest(discoveryRequest);
@@ -54,13 +56,14 @@ namespace MobileConnect.Processors.SiAuthorize
                 Result.ErrorMessage = "Discovery Response is null";
                 return emptyResult;
             }
+
+            Result.DiscoveryResponse = discoveryResponse;
+
             if (!discoveryResponse.IsSucceeded)
             {
                 Result.ErrorMessage = "Discovery Response StatusCode is not success";
                 return emptyResult;
             }
-
-            Result.DiscoveryResponse = discoveryResponse;
 
             if (!TryGetOpenIdConfigurationUrl(discoveryResponse, out var openIdConfigurationUrl))
                 return emptyResult;
@@ -79,7 +82,7 @@ namespace MobileConnect.Processors.SiAuthorize
             if (!string.IsNullOrEmpty(Result.ErrorMessage))
                 return emptyResult;
 
-            if (string.IsNullOrEmpty(CorrelationId) ||
+            if (string.IsNullOrEmpty(_correlationId) ||
                 string.IsNullOrEmpty(openIdConfigurationUrl))
                 return emptyResult;
 
@@ -95,13 +98,14 @@ namespace MobileConnect.Processors.SiAuthorize
                 Result.ErrorMessage = "OpenId Configuration Response is null";
                 return emptyResult;
             }
+
+            Result.OpenIdConfigurationResponse = openIdConfigurationResponse;
+
             if (!openIdConfigurationResponse.IsSucceeded)
             {
                 Result.ErrorMessage = "OpenId Configuration Response StatusCode is not success";
                 return emptyResult;
             }
-
-            Result.OpenIdConfigurationResponse = openIdConfigurationResponse;
 
             if (!TryGetAudience(openIdConfigurationResponse, out var audience))
                 return emptyResult;
@@ -112,21 +116,22 @@ namespace MobileConnect.Processors.SiAuthorize
             return (audience, siAuthorizationEndpoint);
         }
 
-        private async Task<string> ProcessSiAuthorize(string clientId, string audience, string siAuthorizationEndpoint)
+        private async Task ProcessSiAuthorize(string clientId, string audience, string siAuthorizationEndpoint)
         {
-            var emptyResult = "";
-
             if (!string.IsNullOrEmpty(Result.ErrorMessage))
-                return emptyResult;
+                return;
 
-            if (string.IsNullOrEmpty(CorrelationId) ||
+            if (string.IsNullOrEmpty(_correlationId) ||
                 string.IsNullOrEmpty(clientId) ||
                 string.IsNullOrEmpty(audience) ||
                 string.IsNullOrEmpty(siAuthorizationEndpoint))
-                return emptyResult;
+                return;
 
-            var nonce = Guid.NewGuid().ToString();
             var clientNotificationToken = Guid.NewGuid().ToString();
+            var nonce = Guid.NewGuid().ToString();
+
+            Result.ClientNotificationToken = clientNotificationToken;
+            Result.Nonce = nonce;
 
             var responseType = "mc_si_async_code";
             var scope = "openid mc_authn";
@@ -149,7 +154,7 @@ namespace MobileConnect.Processors.SiAuthorize
                     Nonce = nonce,
                     LoginHint = loginHint,
                     AcrValues = acrValues,
-                    CorrelationId = CorrelationId,
+                    CorrelationId = _correlationId,
                     Iss = clientId,
                     Aud = audience,
                     ClientNotificationToken = clientNotificationToken,
@@ -163,20 +168,21 @@ namespace MobileConnect.Processors.SiAuthorize
             if (siAuthorizeResponse == null)
             {
                 Result.ErrorMessage = "SI Authorize Response is null";
-                return emptyResult;
-            }
-            if (!siAuthorizeResponse.IsSucceeded)
-            {
-                Result.ErrorMessage = "SI Authorize Response StatusCode is not success";
-                return emptyResult;
+                return;
             }
 
             Result.SiAuthorizeResponse = siAuthorizeResponse;
 
-            if (!TryGetAuthReqId(siAuthorizeResponse, out var authReqId))
-                return emptyResult;
+            if (!siAuthorizeResponse.IsSucceeded)
+            {
+                Result.ErrorMessage = "SI Authorize Response StatusCode is not success";
+                return;
+            }
 
-            return authReqId;
+            if (!TryGetAuthReqId(siAuthorizeResponse, out var authReqId))
+                return;
+
+            Result.AuthReqId = authReqId;
         }
 
         private bool TryGetOpenIdConfigurationUrl(DiscoveryResponse discoveryResponse,

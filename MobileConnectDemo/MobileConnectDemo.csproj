@@ -122,6 +122,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MobileConnectController.cs" />
+    <Compile Include="DataAccess\Entities\MobileConnectAuthorizeRequest.cs" />
+    <Compile Include="DataAccess\InMemoryDatabase.cs" />
+    <Compile Include="DataAccess\Repository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
