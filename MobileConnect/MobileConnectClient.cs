@@ -40,12 +40,17 @@ namespace MobileConnect
 
                 var responseString = await response.Content.ReadAsStringAsync();
 
-                var responseModel = JsonConvert.DeserializeObject<DiscoveryResponseModel>(responseString);
+                var isSucceeded = response.IsSuccessStatusCode;
+
+                var responseModel = isSucceeded
+                    ? JsonConvert.DeserializeObject<DiscoveryResponseModel>(responseString)
+                    : null;
 
                 return new DiscoveryResponse
                 {
                     Model = responseModel,
-                    JsonString = responseString
+                    JsonString = responseString,
+                    IsSucceeded = isSucceeded
                 };
             }
         }
@@ -55,14 +60,21 @@ namespace MobileConnect
         {
             using (var httpClient = new HttpClient())
             {
-                var responseString = await httpClient.GetStringAsync(requestModel.OpenIdConfigurationUrl);
+                var response = await httpClient.GetAsync(requestModel.OpenIdConfigurationUrl);
 
-                var responseModel = JsonConvert.DeserializeObject<OpenIdConfigurationResponseModel>(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var isSucceeded = response.IsSuccessStatusCode;
+
+                var responseModel = isSucceeded
+                    ? JsonConvert.DeserializeObject<OpenIdConfigurationResponseModel>(responseString)
+                    : null;
 
                 return new OpenIdConfigurationResponse
                 {
                     Model = responseModel,
-                    JsonString = responseString
+                    JsonString = responseString,
+                    IsSucceeded = isSucceeded
                 };
             }
         }
@@ -87,12 +99,17 @@ namespace MobileConnect
 
                 var responseString = await response.Content.ReadAsStringAsync();
 
-                var responseModel = JsonConvert.DeserializeObject<SiAuthorizeResponseModel>(responseString);
+                var isSucceeded = response.IsSuccessStatusCode;
+
+                var responseModel = isSucceeded
+                    ? JsonConvert.DeserializeObject<SiAuthorizeResponseModel>(responseString)
+                    : null;
 
                 return new SiAuthorizeResponse
                 {
                     Model = responseModel,
-                    JsonString = responseString
+                    JsonString = responseString,
+                    IsSucceeded = isSucceeded
                 };
             }
         }

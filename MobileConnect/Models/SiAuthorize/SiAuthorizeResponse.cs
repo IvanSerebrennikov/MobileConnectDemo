@@ -1,9 +1,8 @@
-﻿namespace MobileConnect.Models.SiAuthorize
-{
-    public class SiAuthorizeResponse
-    {
-        public SiAuthorizeResponseModel Model { get; set; }
+﻿using MobileConnect.Models.Base;
 
-        public string JsonString { get; set; }
+namespace MobileConnect.Models.SiAuthorize
+{
+    public class SiAuthorizeResponse : BaseMobileConnectResponse<SiAuthorizeResponseModel>
+    {
     }
 }

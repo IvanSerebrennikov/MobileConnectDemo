@@ -1,9 +1,8 @@
-﻿namespace MobileConnect.Models.Discovery
-{
-    public class DiscoveryResponse
-    {
-        public DiscoveryResponseModel Model { get; set; }
+﻿using MobileConnect.Models.Base;
 
-        public string JsonString { get; set; }
+namespace MobileConnect.Models.Discovery
+{
+    public class DiscoveryResponse : BaseMobileConnectResponse<DiscoveryResponseModel>
+    {
     }
 }

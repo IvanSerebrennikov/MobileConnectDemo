@@ -63,6 +63,7 @@
     <Compile Include="Interfaces\IMobileConnectService.cs" />
     <Compile Include="MobileConnectClient.cs" />
     <Compile Include="MobileConnectDefaultProcessorFactory.cs" />
+    <Compile Include="Models\Base\BaseMobileConnectResponse.cs" />
     <Compile Include="Models\Discovery\DiscoveryRequestModel.cs" />
     <Compile Include="Models\Discovery\DiscoveryResponse.cs" />
     <Compile Include="Models\Discovery\DiscoveryResponseModel.cs" />
