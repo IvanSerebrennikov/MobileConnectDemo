@@ -128,7 +128,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Logger\FakeLogger.cs" />
     <Compile Include="Models\MobileConnectAuthorizeModel.cs" />
+    <Compile Include="Models\MobileConnectNotifyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -12,5 +12,12 @@ namespace MobileConnectDemo.DataAccess
         {
             InMemoryDatabase.MobileConnectAuthorizeRequests.Add(mobileConnectRequest);
         }
+
+        public MobileConnectAuthorizeRequest GetMobileConnectAuthorizeRequest(string authReqId, string correlationId)
+        {
+            return InMemoryDatabase.MobileConnectAuthorizeRequests
+                .FirstOrDefault(x =>
+                    x.AuthReqId == authReqId && x.CorrelationId == correlationId);
+        }
     }
 }
