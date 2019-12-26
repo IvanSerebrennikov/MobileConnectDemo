@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using Jose;
 using Newtonsoft.Json;
@@ -48,14 +51,17 @@ namespace MobileConnect.Helpers
             }
         }
 
-        public static Dictionary<string, string> FromJwtToken(this string token)
+        public static List<Claim> GetJwtTokenClaims(this string jwtInput)
         {
-            var tokenJson = JWT.Decode(token);
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var jwtOutput = string.Empty;
 
-            if (string.IsNullOrEmpty(tokenJson))
-                return new Dictionary<string, string>();
+            if (!jwtHandler.CanReadToken(jwtInput)) 
+                return new List<Claim>();
 
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenJson);
+            var token = jwtHandler.ReadJwtToken(jwtInput);
+
+            return token.Claims.ToList();
         }
     }
 }

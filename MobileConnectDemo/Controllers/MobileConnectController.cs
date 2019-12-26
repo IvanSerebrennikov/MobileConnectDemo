@@ -117,8 +117,9 @@ namespace MobileConnectDemo.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, authErrorMessage);
             }
 
-            var idToken = notifyModel.IdToken.FromJwtToken();
-            if (!idToken.TryGetValue("nonce", out string nonce) || nonce != mobileConnectRequest.Nonce)
+            var idTokenClaims = notifyModel.IdToken.GetJwtTokenClaims();
+            var nonce = idTokenClaims.FirstOrDefault(x => x.Type == "nonce");
+            if (nonce?.Value != mobileConnectRequest.Nonce)
             {
                 var errorMessage = "id_token nonce is null or invalid";
                 MobileConnectNotifyLogger.Warn(
@@ -127,8 +128,9 @@ namespace MobileConnectDemo.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
             }
 
-            var accessToken = notifyModel.AccessToken.FromJwtToken();
-            if (!accessToken.TryGetValue("sub", out string sub) || sub != mobileConnectRequest.PhoneNumber)
+            var accessTokenClaims = notifyModel.AccessToken.GetJwtTokenClaims();
+            var sub = accessTokenClaims.FirstOrDefault(x => x.Type == "sub");
+            if (sub?.Value != mobileConnectRequest.PhoneNumber)
             {
                 var errorMessage = "access_token sub is null or invalid";
                 MobileConnectNotifyLogger.Warn(
