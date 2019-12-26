@@ -133,6 +133,7 @@ namespace MobileConnect.Processors.SiAuthorize
                 {
                     ResponseType = responseType,
                     ClientId = clientId,
+                    Scope = scope,
                     Nonce = nonce,
                     LoginHint = loginHint,
                     AcrValues = acrValues,

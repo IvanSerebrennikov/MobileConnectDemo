@@ -25,6 +25,9 @@ namespace MobileConnect.Models.SiAuthorize
         [JsonProperty("response_type")]
         public string ResponseType { get; set; }
 
+        [JsonProperty("scope")]
+        public string Scope { get; set; }
+
         [JsonProperty("nonce")]
         public string Nonce { get; set; }
 
