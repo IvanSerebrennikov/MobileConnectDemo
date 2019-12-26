@@ -47,5 +47,15 @@ namespace MobileConnect.Helpers
                 return JWT.Encode(payload, rsa, JwsAlgorithm.RS256);
             }
         }
+
+        public static Dictionary<string, string> FromJwtToken(this string token)
+        {
+            var tokenJson = JWT.Decode(token);
+
+            if (string.IsNullOrEmpty(tokenJson))
+                return new Dictionary<string, string>();
+
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenJson);
+        }
     }
 }

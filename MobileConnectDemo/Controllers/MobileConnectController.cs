@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using MobileConnect.Helpers;
 using MobileConnect.Interfaces;
 using MobileConnect.Processors.SiAuthorize;
 using MobileConnect.Services;
@@ -104,51 +105,44 @@ namespace MobileConnectDemo.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
             }
 
+            mobileConnectRequest.IsNotificationReceived = true;
+
             ValidateNotifyRequestAuthorization(mobileConnectRequest.ClientNotificationToken, out var authErrorMessage);
 
             if (!string.IsNullOrEmpty(authErrorMessage))
             {
                 MobileConnectNotifyLogger.Warn(
-                    $"Notify [{notifyGuid}]. {authErrorMessage}");
+                    $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {authErrorMessage}");
 
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, authErrorMessage);
             }
 
+            var idToken = notifyModel.IdToken.FromJwtToken();
+            if (!idToken.TryGetValue("nonce", out string nonce) || nonce != mobileConnectRequest.Nonce)
+            {
+                var errorMessage = "id_token nonce is null or invalid";
+                MobileConnectNotifyLogger.Warn(
+                    $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
+
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
+            }
+
+            var accessToken = notifyModel.AccessToken.FromJwtToken();
+            if (!accessToken.TryGetValue("sub", out string sub) || sub != mobileConnectRequest.PhoneNumber)
+            {
+                var errorMessage = "access_token sub is null or invalid";
+                MobileConnectNotifyLogger.Warn(
+                    $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
+
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
+            }
+
+            mobileConnectRequest.IsAuthorized = true;
+
+            MobileConnectNotifyLogger.Info(
+                $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. Authorized.");
+
             return new HttpStatusCodeResult(HttpStatusCode.NoContent);
-        }
-
-        private void ValidateNotifyRequestAuthorization(
-            string clientNotificationToken, out string authErrorMessage)
-        {
-            var authHeader = Request.Headers["Authorization"];
-
-            if (string.IsNullOrEmpty(authHeader))
-            {
-                authErrorMessage = "Authorization header is null or empty";
-                return;
-            }
-
-            var authHeaderParts = authHeader.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries);
-
-            if (authHeaderParts.Length != 2)
-            {
-                authErrorMessage = "Authorization header is incorrect";
-                return;
-            }
-
-            if (authHeaderParts[0] != "Bearer")
-            {
-                authErrorMessage = "Authorization header scheme is incorrect";
-                return;
-            }
-
-            if (authHeaderParts[1] != clientNotificationToken)
-            {
-                authErrorMessage = "Authorization header value is incorrect";
-                return;
-            }
-
-            authErrorMessage = "";
         }
 
         private MobileConnectNotifyModel ValidateNotifyRequestAndGetMobileConnectNotifyModel(
@@ -189,6 +183,40 @@ namespace MobileConnectDemo.Controllers
 
             validationErrorMessage = "";
             return notifyModel;
+        }
+
+        private void ValidateNotifyRequestAuthorization(
+            string clientNotificationToken, out string authErrorMessage)
+        {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (string.IsNullOrEmpty(authHeader))
+            {
+                authErrorMessage = "Authorization header is null or empty";
+                return;
+            }
+
+            var authHeaderParts = authHeader.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries);
+
+            if (authHeaderParts.Length != 2)
+            {
+                authErrorMessage = "Authorization header is incorrect";
+                return;
+            }
+
+            if (authHeaderParts[0] != "Bearer")
+            {
+                authErrorMessage = "Authorization header scheme is incorrect";
+                return;
+            }
+
+            if (authHeaderParts[1] != clientNotificationToken)
+            {
+                authErrorMessage = "Authorization header value is incorrect";
+                return;
+            }
+
+            authErrorMessage = "";
         }
     }
 }
