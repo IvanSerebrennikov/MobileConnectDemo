@@ -90,7 +90,7 @@ namespace MobileConnectDemo.Controllers
                 MobileConnectNotifyLogger.Warn(
                     $"Notify [{notifyGuid}]. {validationErrorMessage}");
 
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, validationErrorMessage);
+                return BadRequestResult(validationErrorMessage);
             }
 
             var mobileConnectRequest =
@@ -102,7 +102,7 @@ namespace MobileConnectDemo.Controllers
                 MobileConnectNotifyLogger.Warn(
                     $"Notify [{notifyGuid}]. {errorMessage}");
 
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
+                return BadRequestResult(errorMessage);
             }
 
             mobileConnectRequest.IsNotificationReceived = true;
@@ -114,7 +114,7 @@ namespace MobileConnectDemo.Controllers
                 MobileConnectNotifyLogger.Warn(
                     $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {authErrorMessage}");
 
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, authErrorMessage);
+                return BadRequestResult(authErrorMessage);
             }
 
             var idTokenClaims = notifyModel.IdToken.GetJwtTokenClaims();
@@ -125,7 +125,7 @@ namespace MobileConnectDemo.Controllers
                 MobileConnectNotifyLogger.Warn(
                     $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
 
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
+                return BadRequestResult(errorMessage);
             }
 
             var accessTokenClaims = notifyModel.AccessToken.GetJwtTokenClaims();
@@ -136,7 +136,7 @@ namespace MobileConnectDemo.Controllers
                 MobileConnectNotifyLogger.Warn(
                     $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
 
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, errorMessage);
+                return BadRequestResult(errorMessage);
             }
 
             mobileConnectRequest.IsAuthorized = true;
@@ -219,6 +219,13 @@ namespace MobileConnectDemo.Controllers
             }
 
             authErrorMessage = "";
+        }
+
+        private ActionResult BadRequestResult(string message)
+        {
+            Response.StatusCode = 400; 
+
+            return Json(new { message }, JsonRequestBehavior.AllowGet);
         }
     }
 }
