@@ -25,5 +25,11 @@ namespace MobileConnectDemo.Models
 
         [JsonProperty("correlation_id")]
         public string CorrelationId { get; set; }
+
+        [JsonProperty("error")]
+        public string Error { get; set; }
+
+        [JsonProperty("error_description")]
+        public string ErrorDescription { get; set; }
     }
 }

@@ -59,6 +59,8 @@ namespace MobileConnectDemo.Controllers
 
             if (!authorizeResult.IsSucceeded)
             {
+                MobileConnectAuthorizeLogger.Warn(
+                    $"Authorize [authReqId: {authorizeResult.AuthReqId}, correlationId: {authorizeResult.CorrelationId}]. authorizeResult is not succeeded");
                 MobileConnectAuthorizeLogger.Warn(authorizeResult.ToString());
             }
 
@@ -105,8 +107,6 @@ namespace MobileConnectDemo.Controllers
                 return BadRequestResult(errorMessage);
             }
 
-            mobileConnectRequest.IsNotificationReceived = true;
-
             ValidateNotifyRequestAuthorization(mobileConnectRequest.ClientNotificationToken, out var authErrorMessage);
 
             if (!string.IsNullOrEmpty(authErrorMessage))
@@ -117,26 +117,28 @@ namespace MobileConnectDemo.Controllers
                 return BadRequestResult(authErrorMessage);
             }
 
-            var idTokenClaims = notifyModel.IdToken.GetJwtTokenClaims();
-            var nonce = idTokenClaims.FirstOrDefault(x => x.Type == "nonce");
-            if (nonce?.Value != mobileConnectRequest.Nonce)
+            mobileConnectRequest.IsNotificationReceived = true;
+
+            if (!string.IsNullOrEmpty(notifyModel.Error))
             {
-                var errorMessage = "id_token nonce is null or invalid";
+                var errorMessage = $"{notifyModel.Error} - {notifyModel.ErrorDescription}";
+
                 MobileConnectNotifyLogger.Warn(
                     $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
 
                 return BadRequestResult(errorMessage);
             }
-
-            var accessTokenClaims = notifyModel.AccessToken.GetJwtTokenClaims();
-            var sub = accessTokenClaims.FirstOrDefault(x => x.Type == "sub");
-            if (sub?.Value != mobileConnectRequest.PhoneNumber)
+            else
             {
-                var errorMessage = "access_token sub is null or invalid";
-                MobileConnectNotifyLogger.Warn(
-                    $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
+                ValidateTokens(notifyModel, mobileConnectRequest, out string errorMessage);
 
-                return BadRequestResult(errorMessage);
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    MobileConnectNotifyLogger.Warn(
+                        $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
+
+                    return BadRequestResult(errorMessage);
+                }
             }
 
             mobileConnectRequest.IsAuthorized = true;
@@ -146,6 +148,48 @@ namespace MobileConnectDemo.Controllers
 
             return new HttpStatusCodeResult(HttpStatusCode.NoContent);
         }
+
+        [HttpGet]
+        public ActionResult IsAuthorized(string authReqId, string correlationId)
+        {
+            if (string.IsNullOrEmpty(authReqId) || string.IsNullOrEmpty(correlationId))
+            {
+                var errorMessage = "incorrect request parameters";
+                MobileConnectAuthorizeLogger.Warn(
+                    $"IsAuthorized [authReqId: {authReqId}, correlationId: {correlationId}]. {errorMessage}");
+
+                return BadRequestResult(errorMessage);
+            }
+
+            var mobileConnectRequest =
+                _repository.GetMobileConnectAuthorizeRequest(authReqId, correlationId);
+
+            if (mobileConnectRequest == null)
+            {
+                var errorMessage = "mobile connect request not found";
+                MobileConnectAuthorizeLogger.Warn(
+                    $"IsAuthorized [authReqId: {authReqId}, correlationId: {correlationId}]. {errorMessage}");
+
+                return BadRequestResult(errorMessage);
+            }
+
+            if (mobileConnectRequest.IsNotificationReceived == true && mobileConnectRequest.IsAuthorized != true)
+            {
+                var errorMessage = "mobile connect authorization is not succeeded";
+                MobileConnectAuthorizeLogger.Warn(
+                    $"IsAuthorized [authReqId: {authReqId}, correlationId: {correlationId}]. {errorMessage}");
+
+                return BadRequestResult(errorMessage);
+            }
+            else if (mobileConnectRequest.IsAuthorized == true)
+            {
+                return Json(new { authorized = true }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { authorized = false }, JsonRequestBehavior.AllowGet);
+        }
+
+        #region private
 
         private MobileConnectNotifyModel ValidateNotifyRequestAndGetMobileConnectNotifyModel(
             string notifyGuid, out string validationErrorMessage)
@@ -221,11 +265,35 @@ namespace MobileConnectDemo.Controllers
             authErrorMessage = "";
         }
 
+        private void ValidateTokens(MobileConnectNotifyModel notifyModel,
+            MobileConnectAuthorizeRequest mobileConnectRequest, out string errorMessage)
+        {
+            var idTokenClaims = notifyModel.IdToken.GetJwtTokenClaims();
+            var nonce = idTokenClaims.FirstOrDefault(x => x.Type == "nonce");
+            if (nonce?.Value != mobileConnectRequest.Nonce)
+            {
+                errorMessage = "id_token nonce is null or invalid";
+                return;
+            }
+
+            var accessTokenClaims = notifyModel.AccessToken.GetJwtTokenClaims();
+            var sub = accessTokenClaims.FirstOrDefault(x => x.Type == "sub");
+            if (sub?.Value != mobileConnectRequest.PhoneNumber)
+            {
+                errorMessage = "access_token sub is null or invalid";
+                return;
+            }
+
+            errorMessage = "";
+        }
+
         private ActionResult BadRequestResult(string message)
         {
             Response.StatusCode = 400; 
 
             return Json(new { message }, JsonRequestBehavior.AllowGet);
         }
+
+        #endregion
     }
 }

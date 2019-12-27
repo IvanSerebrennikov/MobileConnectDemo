@@ -53,8 +53,10 @@ namespace MobileConnect.Helpers
 
         public static List<Claim> GetJwtTokenClaims(this string jwtInput)
         {
+            if (string.IsNullOrEmpty(jwtInput))
+                return new List<Claim>();
+
             var jwtHandler = new JwtSecurityTokenHandler();
-            var jwtOutput = string.Empty;
 
             if (!jwtHandler.CanReadToken(jwtInput)) 
                 return new List<Claim>();
