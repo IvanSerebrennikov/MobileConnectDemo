@@ -83,26 +83,29 @@ namespace MobileConnectDemo.Controllers
         [HttpPost]
         public ActionResult Notify()
         {
-            var notifyGuid = Guid.NewGuid().ToString();
+            var notifyGuid = Guid.NewGuid().ToString().Substring(0, 13);
 
             var notifyModel = ValidateNotifyRequestAndGetMobileConnectNotifyModel(notifyGuid, out var validationErrorMessage);
 
             if (!string.IsNullOrEmpty(validationErrorMessage))
             {
                 MobileConnectNotifyLogger.Warn(
-                    $"Notify [{notifyGuid}]. {validationErrorMessage}");
+                    $"Notify [#: {notifyGuid}]. {validationErrorMessage}");
 
                 return BadRequestResult(validationErrorMessage);
             }
 
+            var authReqId = notifyModel.AuthReqId;
+            var correlationId = notifyModel.CorrelationId; 
+
             var mobileConnectRequest =
-                _repository.GetMobileConnectAuthorizeRequest(notifyModel.AuthReqId, notifyModel.CorrelationId);
+                _repository.GetMobileConnectAuthorizeRequest(authReqId, correlationId);
 
             if (mobileConnectRequest == null)
             {
                 var errorMessage = "mobile connect request not found";
                 MobileConnectNotifyLogger.Warn(
-                    $"Notify [{notifyGuid}]. {errorMessage}");
+                    $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. {errorMessage}");
 
                 return BadRequestResult(errorMessage);
             }
@@ -112,7 +115,7 @@ namespace MobileConnectDemo.Controllers
             if (!string.IsNullOrEmpty(authErrorMessage))
             {
                 MobileConnectNotifyLogger.Warn(
-                    $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {authErrorMessage}");
+                    $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. {authErrorMessage}");
 
                 return BadRequestResult(authErrorMessage);
             }
@@ -124,7 +127,7 @@ namespace MobileConnectDemo.Controllers
                 var errorMessage = $"{notifyModel.Error} - {notifyModel.ErrorDescription}";
 
                 MobileConnectNotifyLogger.Warn(
-                    $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
+                    $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. {errorMessage}");
 
                 return BadRequestResult(errorMessage);
             }
@@ -135,7 +138,7 @@ namespace MobileConnectDemo.Controllers
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
                     MobileConnectNotifyLogger.Warn(
-                        $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. {errorMessage}");
+                        $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. {errorMessage}");
 
                     return BadRequestResult(errorMessage);
                 }
@@ -144,7 +147,7 @@ namespace MobileConnectDemo.Controllers
             mobileConnectRequest.IsAuthorized = true;
 
             MobileConnectNotifyLogger.Info(
-                $"Notify [{notifyGuid} {mobileConnectRequest.Id}]. Authorized.");
+                $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. Authorized.");
 
             return new HttpStatusCodeResult(HttpStatusCode.NoContent);
         }
@@ -202,7 +205,7 @@ namespace MobileConnectDemo.Controllers
                 var json = new StreamReader(requestBodyStream).ReadToEnd();
 
                 MobileConnectNotifyLogger.Info(
-                    $"Notify [{notifyGuid}]. " +
+                    $"Notify [#: {notifyGuid}]. " +
                     $"Body: {json}; " +
                     $"Headers: {string.Join(", ", Request.Headers.AllKeys.Select(x => $"{x}: {Request.Headers[x]}").ToList())}");
 
