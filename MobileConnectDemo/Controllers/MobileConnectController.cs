@@ -72,7 +72,8 @@ namespace MobileConnectDemo.Controllers
                 CorrelationId = authorizeResult.CorrelationId,
                 Nonce = authorizeResult.Nonce,
                 IsResponseSucceeded = authorizeResult.IsSucceeded,
-                ResponseErrorMessage = authorizeResult.ErrorMessage
+                ResponseErrorMessage = authorizeResult.ErrorMessage,
+                RequestedDateTime = DateTime.Now
             };
 
             _repository.CreateMobileConnectAuthorizeRequest(mobileConnectRequest);
@@ -120,6 +121,14 @@ namespace MobileConnectDemo.Controllers
                 return BadRequestResult(authErrorMessage);
             }
 
+            if (mobileConnectRequest.IsAuthorized == true)
+            {
+                MobileConnectNotifyLogger.Info(
+                    $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. Already Authorized at {mobileConnectRequest.AuthorizedDateTime}.");
+
+                return new HttpStatusCodeResult(HttpStatusCode.NoContent);
+            }
+
             mobileConnectRequest.IsNotificationReceived = true;
 
             if (!string.IsNullOrEmpty(notifyModel.Error))
@@ -145,6 +154,7 @@ namespace MobileConnectDemo.Controllers
             }
 
             mobileConnectRequest.IsAuthorized = true;
+            mobileConnectRequest.AuthorizedDateTime = DateTime.Now;
 
             MobileConnectNotifyLogger.Info(
                 $"Notify [#: {notifyGuid}, authReqId: {authReqId}, correlationId: {correlationId}]. Authorized.");

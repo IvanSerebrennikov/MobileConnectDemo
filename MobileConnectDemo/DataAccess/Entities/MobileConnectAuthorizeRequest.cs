@@ -24,6 +24,8 @@ namespace MobileConnectDemo.DataAccess.Entities
 
         public string Nonce { get; set; }
 
+        public DateTime RequestedDateTime { get; set; }
+
         public bool IsResponseSucceeded { get; set; }
 
         public string ResponseErrorMessage { get; set; }
@@ -31,6 +33,8 @@ namespace MobileConnectDemo.DataAccess.Entities
         public bool? IsNotificationReceived { get; set; }
 
         public bool? IsAuthorized { get; set; }
+
+        public DateTime? AuthorizedDateTime { get; set; }
 
         public override int GetHashCode()
         {
