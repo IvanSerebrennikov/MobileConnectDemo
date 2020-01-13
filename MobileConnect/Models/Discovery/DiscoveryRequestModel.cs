@@ -1,6 +1,8 @@
-﻿namespace MobileConnect.Models.Discovery
+﻿using MobileConnect.Models.Base;
+
+namespace MobileConnect.Models.Discovery
 {
-    public class DiscoveryRequestModel
+    public class DiscoveryRequestModel : BaseMobileConnectRequestModel
     {
         public string PhoneNumber { get; set; }
 

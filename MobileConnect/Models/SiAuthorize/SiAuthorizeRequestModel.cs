@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using MobileConnect.Models.Base;
+using Newtonsoft.Json;
 
 namespace MobileConnect.Models.SiAuthorize
 {
-    public class SiAuthorizeRequestModel
+    public class SiAuthorizeRequestModel : BaseMobileConnectRequestModel
     {
         public string SiAuthorizationUrl { get; set; }
 
